@@ -27,7 +27,7 @@
     }
 
     .container {
-      max-width: 1700px; /* Ampliado aún más para dar más espacio horizontal al catálogo */
+      max-width: 1700px;
       margin: 0 auto;
       padding: 20px;
       width: 100%;
@@ -56,11 +56,11 @@
     .welcome-screen {
       display: flex;
       justify-content: center;
-      align-items: center;
+      align-items: flex-start; /* Alineado arriba en móvil para que el contenido empiece desde arriba */
       width: 100%;
-      height: 100%;
-      padding: 20px; /* Padding general */
-      overflow-y: auto; /* Permitir scroll si el contenido desborda en pantallas pequeñas */
+      height: 100%; /* Ocupar el 100% de la altura disponible */
+      padding: 20px; 
+      overflow-y: auto; /* Permitir scroll si el contenido desborda */
     }
 
     .welcome-card {
@@ -69,7 +69,7 @@
       padding: 25px; 
       box-shadow: 0 20px 60px rgba(0,0,0,0.1);
       text-align: center;
-      width: 100%; /* Ocupa el 100% del ancho disponible en su contenedor */
+      width: 100%;
       max-width: 500px; /* Max-width para pantallas grandes */
       box-sizing: border-box;
       display: flex;
@@ -656,7 +656,6 @@
         padding: 10px;
       }
       .screen {
-        /* Eliminar altura fija y posición absoluta para que fluyan mejor en móvil */
         position: static; 
         height: auto; 
         overflow-y: visible; /* Permitir que el body general controle el scroll */
@@ -675,8 +674,9 @@
       .welcome-card {
         padding: 15px; /* Reducido padding para móviles */
         max-width: 100%; /* Eliminar max-width para que ocupe todo el ancho disponible */
-        margin: 0; /* Asegurar que no haya márgenes que lo empujen */
+        margin: 0 auto; /* Centrar la tarjeta */
         height: auto; /* Ajustar altura al contenido */
+        box-sizing: border-box; /* Asegurar que padding no añada ancho */
       }
       .welcome-title {
         font-size: 1.8em; /* Reducido tamaño para móviles */
@@ -1124,8 +1124,6 @@
     let currentScreen = 1;
     let clientData = {};
 
-    // --- Definición de Funciones (todas definidas antes de ser llamadas o asignadas) ---
-
     // Función para generar un folio único de seguimiento
     function generateTrackingId() {
         const date = new Date();
@@ -1136,7 +1134,7 @@
         const minutes = date.getMinutes().toString().padStart(2, '0');
         const seconds = date.getSeconds().toString().padStart(2, '0');
         const random = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
-        return `GMT-<span class="math-inline">\{year\}</span>{month}<span class="math-inline">\{day\}\-</span>{hours}<span class="math-inline">\{minutes\}</span>{seconds}-${random}`;
+        return `GMT-${year}${month}${day}-${hours}${minutes}${seconds}-${random}`;
     }
 
     // Función para obtener la imagen en Base64 (para PDF)
@@ -1149,17 +1147,18 @@
             canvas.height = img.height;
             var ctx = canvas.getContext("2d");
             ctx.drawImage(img, 0, 0);
-            var dataURL = canvas.toDataURL("image/png");
+            var dataURL = canvas.toDataURL("image/png"); // Preferir PNG para logos con transparencia
             callback(dataURL);
         };
         img.onerror = function() {
             console.error("Error al cargar la imagen para Base64. Usando fallback SVG.");
-            const fallbackSvg = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTUwIiBoZWlnaHQ9IjEwMCI vdmlld0JveD0iMCAwIDE1MCAxMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxNTAiIGhlaWdodD0iMTAwIiBmaWxsPSIjMjc0OWI4Ii8+Cjx0ZXh0IHg9Ijc1IiB5PSI0NSIgZm9udC1mYW1pbHk9IkFyaWFsLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjE2IiBmb250LXdlaWdodD0iYm9sZCIgZmlsbD0id2hpdGUiIHRleHQtYW5jaG9vcj0ibWlkZGxlIj5HbG9iYWxNZWRpVEg8L3RleHQ+Cjx0ZXh0IHg9Ijc1IiB5PSI2NSIgZm9udC1mYW1pbHk9IkFyaWFsLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjEwIiBmb250LXdlaWdodD0iYm9sZCIgZmlsbD0id2hpdGUiIHRleHQtYW5jaG9vcj0ibWlkZGxlIj5NZWRpY2FtZW50b3M8L3RleHQ+Cjwvc3ZnPg==';
+            // Llama al callback con el SVG base64 de fallback
+            const fallbackSvg = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTUwIiBoZWlnaHQ9IjEwMCIgdmlld0JveD0iMCAwIDE1MCAxMDAiIGZpbGw9Im5vbmUiIHxmlnsPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxNTAiIGhlaWdodD0iMTAwIiBmaWxsPSIjMjc0OWI4Ii8+Cjx0ZXh0IHg9Ijc1IiB5PSI0NSIgZm9udC1mYW1pbHk9IkFyaWFsLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjE2IiBmb250LXdlaWdodD0iYm9sZCIgZmlsbD0id2hpdGUiIHRleHQtYW5jaG9vcj0ibWlkZGxlIj5HbG9iYWxNZWRpVEg8L3RleHQ+Cjx0ZXh0IHg9Ijc1IiB5PSI2NSIgZm9udC1mYW1pbHk9IkFyaWFsLCBzYW5zLXNlcmlmIiBmb250LXNpemU9IjEwIiBmb250LXdlaWdodD0iYm9sZCIgZmlsbD0id2hpdGUiIHRleHQtYW5jaG9vcj0ibWlkZGxlIj5NZWRpY2FtZW50b3M8L3RleHQ+Cjwvc3ZnPg==';
             callback(fallbackSvg);
         };
     }
 
-    // Función para navegar entre pantallas
+    // Navegación entre pantallas
     function goToScreen(screenNumber) {
       document.querySelectorAll('.screen').forEach(screen => {
         screen.classList.remove('active');
@@ -1168,133 +1167,131 @@
       currentScreen = screenNumber;
       
       const backBtn = document.getElementById('backBtn');
+      // Mostrar botón de regresar solo si no estamos en la primera pantalla
       backBtn.style.display = screenNumber > 1 ? 'block' : 'none';
 
+      // Si se va a la pantalla de resumen, poblar los datos
       if (screenNumber === 3) {
         populateSummary();
       }
     }
 
-    // Función para retroceder
     function goBack() {
       if (currentScreen > 1) {
         goToScreen(currentScreen - 1);
       }
     }
 
-    // Función para renderizar productos en el catálogo
+    // Formulario de cliente
+    document.getElementById('clientForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      clientData = {
+        nombre: document.getElementById('nombre').value,
+        celular: document.getElementById('celular').value,
+        ciudad: document.getElementById('ciudad').value,
+        correo: document.getElementById('correo').value
+      };
+      
+      goToScreen(2); // Avanza a la pantalla del catálogo
+    });
+
+    // Cargar medicamentos
+    window.onload = async () => {
+      try {
+        const res = await fetch('medicamentos.json');
+        if (!res.ok) {
+          throw new Error(`HTTP error! status: ${res.status}`);
+        }
+        medicamentos = await res.json();
+        // Asumiendo que la primera fila es una cabecera si tiene "Codigo de Barras"
+        if (medicamentos.length > 0 && medicamentos[0].codigoBarras === "Codigo de Barras") {
+          medicamentos.shift(); // Elimina la fila de cabecera
+        }
+        renderProducts(medicamentos); // Renderiza todos los productos inicialmente
+      } catch (error) {
+        console.error("Error al cargar los medicamentos:", error);
+        document.getElementById('productsGrid').innerHTML = 
+          "<p style='text-align: center; color: #dc3545;'>Error al cargar el catálogo. Por favor, intente más tarde.</p>";
+      }
+    };
+
+    // Renderizar productos en el catálogo
     function renderProducts(productsToRender) {
       const grid = document.getElementById('productsGrid');
       grid.innerHTML = '';
       
-      if (!productsToRender || productsToRender.length === 0) { // Comprobación adicional por si no hay datos o son nulos
+      if (productsToRender.length === 0) {
         grid.innerHTML = "<p style='text-align: center; color: #6c757d;'>No se encontraron medicamentos.</p>";
         return;
       }
 
       productsToRender.forEach((product) => {
         const isSelected = selectedProducts.has(product.codigoBarras);
+        // Obtener la cantidad si ya está seleccionado, si no, por defecto 1
         const quantity = isSelected ? selectedProducts.get(product.codigoBarras).cantidad : 1;
         
         const card = document.createElement('div');
-        // Usar un atributo de datos para almacenar el código de barras en el elemento DOM
-        card.dataset.codigoBarras = product.codigoBarras; 
         card.className = `product-card ${isSelected ? 'selected' : ''}`;
         
+        // Al hacer click en la tarjeta, alterna la selección del producto
         card.onclick = () => toggleProduct(product);
         
         card.innerHTML = `
           <div class="product-title">${product.descripcion || 'Sin descripción'}</div>
           <div class="product-info"><strong>Fórmula:</strong> ${product.formula || 'No especificada'}</div>
           <div class="product-info"><strong>Laboratorio:</strong> ${product.laboratorio || 'No especificado'}</div>
-          <div class="product-info"><strong>Código:</strong> <span class="math-inline">\{product\.codigoBarras \|\| 'No disponible'\}</div\>
-<div class\="quantity\-selector" onclick\="event\.stopPropagation\(\)"\>
-<label\>Cantidad\:</label\>
-<input type\="number" class\="quantity\-input" min\="1" value\="</span>{quantity}" 
+          <div class="product-info"><strong>Código:</strong> ${product.codigoBarras || 'No disponible'}</div>
+          <div class="quantity-selector" onclick="event.stopPropagation()">
+            <label>Cantidad:</label>
+            <input type="number" class="quantity-input" min="1" value="${quantity}" 
                    onchange="updateQuantity('${product.codigoBarras}', this.value)" />
           </div>
         `;
         
         grid.appendChild(card);
       });
-      updateCart();
+      updateCart(); // Asegura que el carrito se actualice después de renderizar productos
     }
 
-    // Función para alternar selección de producto (Optimización de rendimiento)
+    // Alternar selección de producto (al hacer click en la tarjeta)
     function toggleProduct(product) {
-      const cardElement = document.querySelector(`.product-card[data-codigo-barras="${product.codigoBarras}"]`);
-      if (!cardElement) return; // Si la tarjeta no existe, salir.
-
       if (selectedProducts.has(product.codigoBarras)) {
         selectedProducts.delete(product.codigoBarras);
-        cardElement.classList.remove('selected'); // Quita la clase 'selected' directamente
       } else {
         selectedProducts.set(product.codigoBarras, { ...product, cantidad: 1 });
-        cardElement.classList.add('selected'); // Añade la clase 'selected' directamente
       }
-      // No se llama a renderProducts aquí, solo se actualiza el carrito.
-      updateCart();
+      // Re-renderiza los productos filtrados para actualizar su estado visual
+      const searchTerm = document.getElementById('busqueda').value.toLowerCase();
+      const filtered = medicamentos.filter(m => filterProduct(m, searchTerm));
+      renderProducts(filtered);
+      updateCart(); // Actualiza el carrito después de la selección
     }
 
-    // Función para actualizar cantidad de un producto seleccionado (Optimización de rendimiento)
+    // Actualizar cantidad de un producto seleccionado
     function updateQuantity(codigo, cantidad) {
       const qty = parseInt(cantidad) || 1;
-      if (qty < 1) return;
+      if (qty < 1) return; // Evita cantidades menores a 1
 
       if (selectedProducts.has(codigo)) {
         const product = selectedProducts.get(codigo);
         product.cantidad = qty;
         selectedProducts.set(codigo, product);
-        // Solo actualizar el contador visual en la tarjeta si es necesario, y luego el carrito
-        const cardElement = document.querySelector(`.product-card[data-codigo-barras="${codigo}"] .quantity-input`);
-        if(cardElement) {
-            cardElement.value = qty; // Asegura que el input refleje la cantidad
-        }
-        updateCart();
+        updateCart(); // Actualiza el carrito después de cambiar la cantidad
       }
     }
 
-    // Función para eliminar producto del carrito (Optimización de rendimiento)
+    // Eliminar producto del carrito (botón 'x' en el carrito)
     function removeItemFromCart(codigo) {
       selectedProducts.delete(codigo);
-      const cardElement = document.querySelector(`.product-card[data-codigo-barras="${codigo}"]`);
-      if (cardElement) {
-        cardElement.classList.remove('selected'); // Quita la clase 'selected'
-      }
-      updateCart();
+      // Re-renderiza los productos filtrados para desmarcar el elemento eliminado
+      const searchTerm = document.getElementById('busqueda').value.toLowerCase();
+      const filtered = medicamentos.filter(m => filterProduct(m, searchTerm));
+      renderProducts(filtered);
+      updateCart(); // Actualiza el carrito
     }
 
-    // Función para la búsqueda de productos en tiempo real (Optimización de rendimiento)
-    function handleSearchInput() { // Renombrada para mayor claridad
-      this.value = this.value.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase();
-      const searchTerm = this.value;
-      if (window.medicamentos) {
-        const filteredProducts = window.medicamentos.filter(product => {
-          return filterProduct(product, searchTerm);
-        });
-        renderProducts(filteredProducts); // renderProducts sí recrea la cuadrícula cuando el filtro cambia
-      } else {
-        console.warn("No se puede buscar: 'window.medicamentos' no está definido.");
-      }
-    }
-
-    // Función auxiliar para filtrar productos (accent-insensitive y uppercase)
-    function filterProduct(product, searchTerm) {
-      const normalizeAndUppercase = (text) => 
-        (text || '').normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase();
-
-      const desc = normalizeAndUppercase(product.descripcion);
-      const formula = normalizeAndUppercase(product.formula);
-      const laboratorio = normalizeAndUppercase(product.laboratorio);
-      const codigoBarras = normalizeAndUppercase(product.codigoBarras);
-
-      return desc.includes(searchTerm) ||
-             formula.includes(searchTerm) ||
-             laboratorio.includes(searchTerm) ||
-             codigoBarras.includes(searchTerm);
-    }
-
-    // Función para actualizar la vista del carrito lateral
+    // Actualizar la vista del carrito lateral
     function updateCart() {
       const cartItems = document.getElementById('cartItems');
       const cartTotal = document.getElementById('cartTotal');
@@ -1303,7 +1300,7 @@
       if (selectedProducts.size === 0) {
         cartItems.innerHTML = "<p style='text-align: center; color: #6c757d; font-style: italic;'>No hay productos seleccionados</p>";
         cartTotal.textContent = "Total: 0 producto(s)";
-        quoteBtn.disabled = true;
+        quoteBtn.disabled = true; // Deshabilita el botón si no hay productos
         return;
       }
 
@@ -1315,8 +1312,8 @@
         html += `
           <div class="cart-item">
             <div class="cart-item-title">${product.descripcion || 'Producto sin descripción'}</div>
-            <div class="cart-item-info">Código: <span class="math-inline">\{product\.codigoBarras \|\| 'N/A'\}</div\>
-<div class\="cart\-item\-quantity"\></span>{product.cantidad}</div>
+            <div class="cart-item-info">Código: ${product.codigoBarras || 'N/A'}</div>
+            <div class="cart-item-quantity">${product.cantidad}</div>
             <button class="remove-item" onclick="removeItemFromCart('${product.codigoBarras}')">
               <i class="fas fa-times"></i>
             </button>
@@ -1326,16 +1323,38 @@
       
       cartItems.innerHTML = html;
       cartTotal.textContent = `Total: ${totalItems} producto(s)`;
-      quoteBtn.disabled = false;
+      quoteBtn.disabled = false; // Habilita el botón si hay productos
     }
 
-    // Función para ir a la pantalla de resumen
+    // Búsqueda de productos en tiempo real
+    document.getElementById('busqueda').addEventListener('keyup', function() {
+      const searchTerm = this.value.toLowerCase();
+      const filteredProducts = medicamentos.filter(product => {
+        return filterProduct(product, searchTerm);
+      });
+      renderProducts(filteredProducts);
+    });
+
+    // Función auxiliar para filtrar productos
+    function filterProduct(product, searchTerm) {
+      const desc = (product.descripcion || '').toLowerCase();
+      const formula = (product.formula || '').toLowerCase();
+      const laboratorio = (product.laboratorio || '').toLowerCase();
+      const codigoBarras = (product.codigoBarras || '').toLowerCase();
+
+      return desc.includes(searchTerm) ||
+             formula.includes(searchTerm) ||
+             laboratorio.includes(searchTerm) ||
+             codigoBarras.includes(searchTerm);
+    }
+
+    // Ir a la pantalla de resumen
     function goToSummary() {
       if (selectedProducts.size === 0) {
         alert("Por favor, selecciona al menos un producto para generar la cotización.");
         return;
       }
-      populateSummary();
+      populateSummary(); // Llena los datos del resumen antes de cambiar de pantalla
       goToScreen(3);
     }
 
@@ -1343,10 +1362,6 @@
     function populateSummary() {
       const clientSummaryDiv = document.getElementById('clientSummary');
       clientSummaryDiv.innerHTML = `
-        <div class="contact-item">
-          <i class="fas fa-file-invoice"></i>
-          <span>Folio de Seguimiento: ${clientData.folio || 'N/A'}</span>
-        </div>
         <div class="contact-item">
           <i class="fas fa-user"></i>
           <span>Nombre: ${clientData.nombre || 'N/A'}</span>
@@ -1377,138 +1392,112 @@
       });
     }
 
-    // Función para generar PDF
+    // Generar PDF
     async function generarPDF() {
       const { jsPDF } = window.jspdf;
       const doc = new jsPDF();
 
+      // Obtener el logo en Base64 para incrustarlo en el PDF
       getBase64Image('logo.png', function(logoBase64) {
           const pageWidth = doc.internal.pageSize.getWidth();
-          const imgWidth = 50;
-          const imgHeight = (imgWidth * 420) / 1488;
-          const imgX = (pageWidth - imgWidth) / 2;
+          const imgWidth = 50; // Ancho deseado para el logo en el PDF
+          const imgHeight = (imgWidth * 420) / 1488; // Proporción original de tu logo (1488x420px)
+          const imgX = (pageWidth - imgWidth) / 2; // Centrar el logo
 
           if (logoBase64) {
               doc.addImage(logoBase64, 'PNG', imgX, 10, imgWidth, imgHeight);
           } else {
+              // Si falla la carga del logo, se usa el fallback SVG que ya está en Base64
+              // En un escenario real, deberías tener un fallback PNG/JPG más robusto
               doc.addImage(document.querySelector('.summary-logo img').src, 'JPEG', imgX, 10, imgWidth, imgHeight);
           }
           
-          let y = 10 + imgHeight + 5;
+          let y = 10 + imgHeight + 10; // Espacio después del logo
 
-          // Contenido de la cabecera del PDF
-          doc.setFontSize(16); // Título más pequeño
+          doc.setFontSize(22);
           doc.setTextColor(44, 62, 80);
           doc.text("Cotización GlobalMediTH", pageWidth / 2, y, { align: "center" });
-          y += 6; // Espacio
-          doc.setFontSize(7); // Mensaje persuasivo más pequeño
+          y += 10;
+          doc.setFontSize(10);
           doc.setTextColor(50, 150, 70);
           doc.text("¡Medicamentos de calidad con atención personalizada para tu tranquilidad!", pageWidth / 2, y, { align: "center" });
-          y += 10; // Más espacio
+          y += 20;
 
-          // **NUEVA ESTRUCTURA DE COLUMNAS PARA DATOS EN PDF**
-          const startX = 10; // Margen izquierdo
-          const columnWidth = (pageWidth - (startX * 2) - 5) / 2; // Ancho de columna, 5 es el espacio entre ellas
-          const lineHeight = 4; // Altura de línea para los datos
-
-          // Datos de Contacto de Ventas (compacto)
-          doc.setFontSize(8); // Título de sección más pequeño
+          doc.setFontSize(12);
           doc.setTextColor(0, 0, 0);
-          doc.setFont(undefined, 'bold');
-          doc.text("Datos de Contacto de Ventas:", startX, y);
-          doc.setFont(undefined, 'normal');
-          doc.text(`Celular: 2381646718`, startX, y + lineHeight);
-          doc.text(`Correo: globalmedith@gmail.com`, startX, y + 2 * lineHeight);
-          doc.text(`Ubicación: Tehuacán, Puebla`, startX, y + 3 * lineHeight);
-          
-          // Datos del Cliente (compacto, en la segunda columna)
-          doc.setFont(undefined, 'bold');
-          doc.text("Datos del Cliente:", startX + columnWidth + 5, y);
-          doc.setFont(undefined, 'normal');
-          doc.text(`Folio de Seguimiento: ${clientData.folio || 'N/A'}`, startX + columnWidth + 5, y + lineHeight);
-          doc.text(`Nombre: ${clientData.nombre || 'N/A'}`, startX + columnWidth + 5, y + 2 * lineHeight);
-          doc.text(`Celular: ${clientData.celular || 'N/A'}`, startX + columnWidth + 5, y + 3 * lineHeight);
-          doc.text(`Ciudad: ${clientData.ciudad || 'N/A'}`, startX + columnWidth + 5, y + 4 * lineHeight);
-          doc.text(`Correo: ${clientData.correo || 'N/A'}`, startX + columnWidth + 5, y + 5 * lineHeight);
 
-          y += Math.max(4 * lineHeight, 6 * lineHeight) + 10; // Mover Y a la posición más baja de ambas columnas + un margen
+          // Datos de Contacto de Ventas
+          doc.setFont(undefined, 'bold');
+          doc.text("Datos de Contacto de Ventas:", 10, y);
+          y += 7;
+          doc.setFont(undefined, 'normal');
+          doc.text(`Celular: 2381646718`, 10, y);
+          y += 7;
+          doc.text(`Correo: globalmedith@gmail.com`, 10, y);
+          y += 7;
+          doc.text(`Ubicación: Tehuacán, Puebla`, 10, y);
+          y += 15;
 
-          doc.setFontSize(10); // Título de sección de productos
+          // Datos del Cliente
+          doc.setFont(undefined, 'bold');
+          doc.text("Datos del Cliente:", 10, y);
+          y += 7;
+          doc.setFont(undefined, 'normal');
+          doc.text(`Nombre: ${clientData.nombre || 'N/A'}`, 10, y);
+          y += 7;
+          doc.text(`Celular: ${clientData.celular || 'N/A'}`, 10, y);
+          y += 7;
+          doc.text(`Ciudad: ${clientData.ciudad || 'N/A'}`, 10, y);
+          y += 7;
+          doc.text(`Correo: ${clientData.correo || 'N/A'}`, 10, y);
+          y += 15;
+
+          // Productos seleccionados (usando autoTable)
           doc.setFont(undefined, 'bold');
           doc.text("Productos Seleccionados:", 10, y);
-          y += 5; // Espacio
+          y += 10;
           doc.setFont(undefined, 'normal');
 
-          // Celdas para la tabla PDF (excluyendo "Fórmula" y ajustando tamaños para un diseño más compacto)
-          const headers = [
-            { header: "Código de Barras", dataKey: "codigoBarras" },
-            { header: "Descripción", dataKey: "descripcion" },
-            { header: "Laboratorio", dataKey: "laboratorio" },
-            { header: "Cantidad", dataKey: "cantidad" }
-          ];
-
-          const data = Array.from(selectedProducts.values()).map(p => ({
-            codigoBarras: p.codigoBarras || 'N/A',
-            descripcion: p.descripcion || 'Sin descripción',
-            laboratorio: p.laboratorio || 'No especificado',
-            cantidad: p.cantidad
-          }));
+          const headers = [["Código de Barras", "Descripción", "Fórmula", "Laboratorio", "Cantidad"]];
+          const data = Array.from(selectedProducts.values()).map(p => [
+            p.codigoBarras || 'N/A',
+            p.descripcion || 'Sin descripción',
+            p.formula || 'No especificada',
+            p.laboratorio || 'No especificado',
+            p.cantidad
+          ]);
 
           doc.autoTable({
             startY: y,
-            head: [headers.map(h => h.header)],
-            body: data.map(row => headers.map(h => row[h.dataKey])),
-            styles: { 
-                fontSize: 6.5, // Reducido tamaño de fuente para la tabla del PDF para mayor compactación
-                cellPadding: 0.8, // Reducido padding de celda para la tabla del PDF
-                overflow: 'linebreak',
-                lineColor: [220, 220, 220],
-                lineWidth: 0.1 
-            },
-            headStyles: { 
-                fillColor: [240, 240, 240], 
-                textColor: [50, 50, 50], 
-                fontStyle: 'bold' 
-            },
-            alternateRowStyles: { 
-                fillColor: [250, 250, 250] 
-            },
+            head: headers,
+            body: data,
+            styles: { fontSize: 9, cellPadding: 2, overflow: 'linebreak' },
+            headStyles: { fillColor: [248, 249, 250], textColor: [44, 62, 80], fontStyle: 'bold' },
+            alternateRowStyles: { fillColor: [248, 249, 250] },
             margin: { left: 10, right: 10 },
-            columnStyles: { // Ajuste de anchos de columna para optimizar espacio
-                0: { cellWidth: 35 }, // Código de Barras (más estrecho)
-                1: { cellWidth: 'auto' }, // Descripción (automático, ocupará el resto)
-                2: { cellWidth: 30 }, // Laboratorio (más estrecho)
-                3: { cellWidth: 15 }  // Cantidad (más estrecho)
-            },
-            didParseCell: function(data) { // Centrar Cantidad
-                if (data.column.dataKey === 'cantidad') {
-                    data.cell.styles.halign = 'center';
-                }
-            },
             didDrawPage: function(data) {
+              // Footer
               doc.setFontSize(8);
               const pageCount = doc.internal.getNumberOfPages();
               doc.text(`Página ${data.pageNumber} de ${pageCount}`, data.settings.margin.left, doc.internal.pageSize.height - 10);
             }
           });
           
-          const filename = `Cotizacion_GlobalMediTH_${(clientData.nombre || 'cliente').replace(/\s/g, '_')}_${clientData.folio || ''}.pdf`;
+          const filename = `Cotizacion_GlobalMediTH_${(clientData.nombre || 'cliente').replace(/\s/g, '_')}.pdf`;
           doc.save(filename);
       });
     }
 
-    // Función para enviar por WhatsApp
+    // Enviar por WhatsApp
     function enviarWhatsApp() {
       const nombre = clientData.nombre || 'N/A';
       const celular = clientData.celular || 'N/A';
       const ciudad = clientData.ciudad || 'N/A';
       const correo = clientData.correo || 'N/A';
-      const folio = clientData.folio || 'N/A';
 
       let message = `¡Hola GlobalMediTH!%0A%0AMe gustaría solicitar una cotización con la siguiente información:%0A%0A`;
       
       message += `*Datos del Cliente:*%0A`;
-      message += `📝 Folio de Seguimiento: ${folio}%0A`;
       message += `🧑‍💻 Nombre: ${nombre}%0A`;
       message += `📱 Celular: ${celular}%0A`;
       message += `🏙️ Ciudad: ${ciudad}%0A`;
@@ -1528,55 +1517,6 @@
       const whatsappUrl = `https://wa.me/522381646718?text=${encodeURIComponent(message)}`;
       window.open(whatsappUrl, '_blank');
     }
-
-    // --- Lógica principal y eventos ---
-
-    // Manejador del formulario de cliente
-    document.getElementById('clientForm').addEventListener('submit', function(e) {
-      e.preventDefault();
-      
-      clientData = {
-        nombre: document.getElementById('nombre').value,
-        celular: document.getElementById('celular').value,
-        ciudad: document.getElementById('ciudad').value,
-        correo: document.getElementById('correo').value,
-        folio: generateTrackingId() // Asignar folio único
-      };
-      
-      goToScreen(2); // Avanza a la pantalla del catálogo
-    });
-
-    // Cargar medicamentos al iniciar la ventana
-    window.onload = async () => {
-      try {
-        console.log("Iniciando carga de medicamentos.json...");
-        const res = await fetch('medicamentos.json');
-        
-        if (!res.ok) {
-          throw new Error(`HTTP error! Status: ${res.status} - ${res.statusText}`);
-        }
-        
-        window.medicamentos = await res.json(); // Asignar a window.medicamentos (variable global)
-        console.log("Medicamentos cargados exitosamente:", window.medicamentos); 
-
-        // Asumiendo que la primera fila es una cabecera si tiene "Codigo de Barras"
-        if (window.medicamentos.length > 0 && window.medicamentos[0].codigoBarras === "Codigo de Barras") {
-          console.log("Detectada fila de cabecera, eliminando...");
-          window.medicamentos.shift();
-        }
-
-        renderProducts(window.medicamentos); // Renderizar productos después de la carga exitosa
-        console.log("Productos renderizados y carrito actualizado.");
-
-        // ASIGNAR EL EVENT LISTENER DEL BUSCADOR AQUÍ DESPUÉS DE QUE TODO ESTÉ LISTO Y EL DOM DE productsGrid exista
-        document.getElementById('busqueda').addEventListener('keyup', handleSearchInput);
-
-      } catch (error) {
-        console.error("Error crítico al cargar o parsear medicamentos.json:", error);
-        document.getElementById('productsGrid').innerHTML = 
-          `<p style='text-align: center; color: #dc3545;'>Error al cargar el catálogo: ${error.message}. Por favor, asegúrese de que el archivo 'medicamentos.json' existe, está accesible y tiene un formato JSON válido.</p>`;
-      }
-    };
   </script>
 </body>
 </html>
