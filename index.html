@@ -17,7 +17,7 @@
     
     html, body {
       height: 100%;
-      overflow: hidden; /* Controla el scroll general del navegador */
+      overflow: hidden; /* Controla el scroll general del navegador en desktop */
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       color: #333;
@@ -256,7 +256,7 @@
       display: flex;
       flex-direction: column;
       width: 100%;
-      min-width: 1000px;
+      min-width: 1000px; /* Esto es un problema en móviles, se ajustará en media query */
       max-width: 1300px;
     }
 
@@ -648,79 +648,83 @@
 
     /* Responsive General para móviles */
     @media (max-width: 768px) {
-      body {
-        align-items: flex-start; /* Permite que el contenido no esté pegado al centro verticalmente */
+      /* Asegura que el body pueda hacer scroll si el contenido es largo */
+      html, body {
+        height: auto; /* Permitir que la altura se ajuste al contenido */
+        overflow-y: auto; /* Permitir scroll vertical en el body */
+        display: block; /* Cambiar a block para flujo normal en móvil */
         padding-top: 10px; /* Pequeño padding superior */
-        overflow-y: auto; /* Permitir scroll en el body general para contenido largo */
       }
       .container {
         padding: 10px;
-        height: auto; /* Permitir que el contenedor ajuste su altura al contenido */
+        width: 100%;
+        height: auto; /* Permitir que el contenedor ajuste su altura */
+        position: static; /* No fijo para que fluya con el contenido */
       }
       .screen {
-        position: static; 
-        height: auto; 
-        overflow-y: visible; /* Permitir que el body general controle el scroll */
-        display: block; /* Volver a block para que los hijos fluyan normalmente */
+        position: static; /* Las pantallas se apilan normalmente */
+        height: auto; /* Altura auto para que el contenido determine la altura */
+        overflow-y: visible; /* Permitir que el contenido dentro de la pantalla se desborde si es necesario para que el body lo maneje */
+        display: block; /* Flujo de bloque para los elementos de la pantalla */
       }
       .screen.active {
-        display: block; /* Asegurar que la pantalla activa se muestre */
+        display: block; /* Asegurar que la pantalla activa se muestre como bloque */
       }
 
       /* PANTALLA 1 - REGISTRO */
       .welcome-screen {
-        padding: 10px; /* Reducido padding para móviles */
-        overflow-y: auto; /* Permitir scroll si el contenido desborda en pantallas pequeñas */
-        height: auto; /* Dejar que la altura se ajuste al contenido */
+        padding: 10px;
+        height: auto; /* Altura auto para que el contenido determine la altura */
+        overflow-y: visible; /* Permitir que el body maneje el scroll */
       }
       .welcome-card {
-        padding: 15px; /* Reducido padding para móviles */
-        max-width: 100%; /* Eliminar max-width para que ocupe todo el ancho disponible */
-        margin: 0 auto; /* Centrar la tarjeta */
-        height: auto; /* Ajustar altura al contenido */
-        box-sizing: border-box; /* Asegurar que padding no añada ancho */
+        padding: 15px;
+        max-width: 100%; /* Ocupar todo el ancho disponible */
+        margin: 0 auto; /* Centrar */
+        height: auto; /* Altura auto */
+        box-sizing: border-box;
       }
       .welcome-title {
-        font-size: 1.8em; /* Reducido tamaño para móviles */
+        font-size: 1.8em;
       }
       .welcome-subtitle {
-        font-size: 0.8em; /* Reducido tamaño para móviles */
+        font-size: 0.8em;
       }
       .logo img {
-        height: 50px; /* Reducido tamaño del logo para móviles */
+        height: 50px;
       }
       .persuasive-message {
-        padding: 8px; /* Reducido padding para móviles */
-        font-size: 0.75em; /* Reducido tamaño para móviles */
+        padding: 8px;
+        font-size: 0.75em;
         margin-bottom: 15px;
       }
       .medicine-types {
-        flex-direction: column; /* Apilar verticalmente en móvil */
-        gap: 8px; /* Reducido gap */
+        flex-direction: column; /* Apilar verticalmente */
+        gap: 8px;
         margin-bottom: 15px;
       }
       .medicine-type {
         min-width: unset;
-        width: 100%; /* Ocupar todo el ancho disponible */
+        width: 100%;
         padding: 8px;
-        font-size: 0.9em; /* Ajustado tamaño para móviles */
+        font-size: 0.9em;
       }
       .medicine-type i {
-        font-size: 1.5em; /* Reducido tamaño de icono */
+        font-size: 1.5em;
       }
       .form-group {
-        margin-bottom: 10px; /* Reducido margen */
+        margin-bottom: 10px;
       }
       .form-group label {
-        font-size: 0.8em; /* Reducido tamaño */
+        font-size: 0.8em;
       }
       .form-group input {
-        padding: 10px; /* Reducido padding */
-        font-size: 0.8em; /* Reducido tamaño */
+        padding: 10px;
+        font-size: 0.8em;
       }
       .btn {
-        padding: 10px 20px; /* Reducido padding */
-        font-size: 0.9em; /* Reducido tamaño */
+        padding: 10px 20px;
+        font-size: 0.9em;
         width: 100%; /* Ocupar todo el ancho */
       }
 
@@ -728,17 +732,22 @@
       /* PANTALLA 2 - CATÁLOGO (AJUSTES ESPECÍFICOS PARA MÓVIL) */
       .catalog-screen {
         grid-template-columns: 1fr; /* Una sola columna en móvil */
-        padding: 10px; /* Menos padding */
-        gap: 15px; /* Menos espacio entre elementos */
+        padding: 10px;
+        gap: 15px;
         height: auto; /* Dejar que la altura se ajuste */
-        overflow-y: visible; /* El body general maneja el scroll */
+        overflow-y: visible; /* Permitir que el body general maneje el scroll */
+        display: block; /* Asegurarse de que el grid se comporte como bloque */
       }
       .catalog-main {
-        max-height: unset; /* Dejar que la altura se ajuste */
-        min-width: unset; /* Eliminar min-width fijo */
-        padding: 15px; /* Menos padding */
+        max-height: unset; /* Altura auto */
+        min-width: unset; /* ELIMINAR min-width para móviles */
+        padding: 15px;
         height: auto;
-        overflow-y: visible; /* Permitir que el products-grid scroll interno funcione si el contenido es grande */
+        overflow-y: visible; /* Permitir scroll si el contenido desborda, el body maneja el general */
+        width: 100%; /* Asegurar que ocupe el 100% del contenedor */
+      }
+      .fixed-header-content {
+          width: 100%; /* Asegurar que el header también ocupe el 100% */
       }
       .catalog-header {
         margin-bottom: 15px;
@@ -751,27 +760,29 @@
       }
       .products-grid {
         grid-template-columns: 1fr; /* Una columna para productos en móvil */
-        max-height: unset; /* Dejar que la altura sea flexible */
-        padding-right: 0; /* Sin padding extra para scrollbar en móvil */
+        max-height: unset; /* Altura flexible */
+        padding-right: 0;
         height: auto;
+        overflow-y: auto; /* Mantener el scroll interno para la lista de productos */
       }
       .product-card {
-        padding: 12px; /* Reducido padding de tarjetas */
+        padding: 12px;
         font-size: 0.9em;
       }
       .product-info {
         font-size: 0.8em;
       }
       .quantity-selector {
-        flex-wrap: wrap; /* Permitir que los elementos se envuelvan */
+        flex-wrap: wrap;
         justify-content: center;
       }
       .cart-sidebar {
-        position: relative; /* No sticky en móvil para que fluya */
+        position: relative; /* No sticky en móvil para que fluya con el contenido */
         top: auto;
-        margin-top: 15px;
-        padding: 15px; /* Menos padding */
-        max-height: unset;
+        margin-top: 15px; /* Añadir un margen superior para separarlo del catálogo */
+        padding: 15px;
+        max-height: unset; /* Altura auto */
+        width: 100%; /* Asegurar que ocupe todo el ancho */
       }
       .cart-header {
         font-size: 1.2em;
@@ -786,7 +797,9 @@
 
       /* PANTALLA 3 - RESUMEN (AJUSTES ESPECÍFICOS PARA MÓVIL) */
       .summary-screen {
-        padding: 15px; /* Menos padding en móvil */
+        padding: 15px;
+        max-width: 100%; /* Ocupar todo el ancho */
+        margin: 0 auto;
         max-height: calc(100vh - 20px); /* Ajuste la altura máxima para tener un pequeño margen */
         overflow-y: auto; /* Permitir scroll en toda la pantalla de resumen si es necesario */
       }
@@ -797,39 +810,40 @@
           margin-bottom: 10px;
       }
       .summary-fixed-header .summary-header {
-          grid-column: auto; /* Eliminar span 2 */
+          grid-column: auto;
           margin-bottom: 10px;
       }
       .summary-fixed-header .contact-info,
       .summary-fixed-header .client-info {
-          grid-column: auto; /* Eliminar columna fija */
-          padding: 10px; /* Aumentar padding para mejor toque */
-          margin-bottom: 0; /* Asegurar que no haya margen vertical si se apilan */
+          grid-column: auto;
+          padding: 10px;
+          margin-bottom: 0;
       }
       .summary-logo img {
-        height: 40px; /* Logo más pequeño en móvil */
+        height: 40px;
       }
       .summary-title {
-        font-size: 1.1em; /* Título más pequeño en móvil */
+        font-size: 1.1em;
       }
       .summary-screen .persuasive-message {
-        font-size: 0.7em; /* Mensaje persuasivo más pequeño en móvil */
+        font-size: 0.7em;
+        padding: 5px 8px;
       }
       .contact-info h3, .client-info h3 {
-        font-size: 0.75em; /* Encabezados de datos más pequeños en móvil */
+        font-size: 0.75em;
       }
       .contact-item {
-        font-size: 0.6em; /* Ítems de datos más pequeños en móvil */
+        font-size: 0.6em;
       }
       .summary-table th, .summary-table td {
-        font-size: 0.65em; /* Tabla de productos más pequeña en móvil */
+        font-size: 0.65em;
         padding: 4px;
       }
       .products-summary {
-        padding: 10px; /* Menos padding para la tabla */
+        padding: 10px;
       }
       .summary-actions {
-        flex-direction: column; /* Botones apilados */
+        flex-direction: column;
         gap: 10px;
         margin-top: 15px;
       }
@@ -883,7 +897,7 @@
       }
       .catalog-main {
         padding: 20px;
-        min-width: unset; /* Eliminar min-width fijo para tablets */
+        min-width: unset; /* **Eliminar min-width fijo para tablets también** */
         max-width: 900px; /* Mantener un max-width razonable */
       }
       .products-grid {
